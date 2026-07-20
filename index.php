@@ -13,7 +13,7 @@ session_write_close();
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1"/>
-<title>PalliCare — Community Health Platform</title>
+<title>BPDA Telemedicine App</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
 <link rel="stylesheet" href="assets/css/style.css"/>
 </head>
@@ -26,8 +26,8 @@ session_write_close();
       <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
     </div>
     <div>
-      <div class="brand-name">PalliCare</div>
-      <div class="brand-sub">Community Health Platform</div>
+      <div class="brand-name">BPDA Telemedicine</div>
+      <div class="brand-sub">Smart App Platform</div>
     </div>
   </div>
 
@@ -46,7 +46,6 @@ session_write_close();
     </div>
     <button class="btn btn-primary btn-block" id="login-btn" onclick="doLogin()">Sign In</button>
     <p class="auth-switch">Don't have an account? <a href="#" onclick="showCard('register-card')">Register</a></p>
-    <p class="demo-hint">Demo password: <code>password123</code></p>
   </div>
 
   <!-- REGISTER -->
@@ -57,7 +56,7 @@ session_write_close();
     <div id="reg-success" class="alert alert-success" style="display:none">✅ Registered! Wait for admin approval.</div>
     <div class="form-group">
       <label class="form-label">Full Name</label>
-      <input class="form-input" id="reg-name" type="text" placeholder="Abdur Rahim"/>
+      <input class="form-input" id="reg-name" type="text" placeholder="Your Name"/>
     </div>
     <div class="form-group">
       <label class="form-label">Role</label>
@@ -91,8 +90,8 @@ session_write_close();
         <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
       </div>
       <div>
-        <div class="sb-name">PalliCare</div>
-        <div class="sb-sub">Health Platform</div>
+        <div class="sb-name">BPDA Telemedicine</div>
+        <div class="sb-sub">Smart App Platform</div>
       </div>
     </div>
     <nav class="sb-nav" id="sb-nav"></nav>
