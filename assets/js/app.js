@@ -287,6 +287,7 @@ async function submitRx(status){
 
 /* ── MEDICINES ────────────────────────────────── */
 async function pgMedicines(search=''){
+  if(ROLE!=='ADMIN'){go('dashboard');return;}
   const res=await api(`api/admin/medicines.php?limit=200${search?'&search='+encodeURIComponent(search):''}`);
   if(!res.success){setPage(errPage(em(res),"pgMedicines()"));return;}
   const meds=res.data||[];
@@ -318,17 +319,20 @@ async function pgMedicines(search=''){
 }
 function showMedForm(){const f=document.getElementById('med-form');f.style.display=f.style.display==='none'?'block':'none';}
 async function addMed(){
+  if(ROLE!=='ADMIN')return;
   const n=document.getElementById('med-n')?.value.trim();if(!n){toast('Name required','error');return;}
   const res=await api('api/admin/medicines.php',{method:'POST',body:JSON.stringify({name:n,genericName:document.getElementById('med-g').value.trim(),form:document.getElementById('med-f').value})});
   if(res.success){toast('Medicine added!');pgMedicines();}else toast(em(res),'error');
 }
 async function toggleMed(id,active){
+  if(ROLE!=='ADMIN')return;
   const res=await api(`api/admin/medicines.php?id=${id}`,{method:active?'DELETE':'PATCH',body:active?null:JSON.stringify({isActive:true})});
   if(res.success){toast(active?'Deactivated':'Reactivated');pgMedicines();}else toast(em(res),'error');
 }
 
 /* ── USERS ────────────────────────────────────── */
 async function pgUsers(search='',status='',role=''){
+  if(ROLE!=='ADMIN'){go('dashboard');return;}
   const url=`api/admin/users.php?limit=100${search?'&search='+encodeURIComponent(search):''}${status?'&status='+status:''}${role?'&role='+role:''}`;
   const res=await api(url);
   if(!res.success){setPage(errPage(em(res),"pgUsers()"));return;}
@@ -360,12 +364,22 @@ async function pgUsers(search='',status='',role=''){
       </tr>`).join('')}</tbody></table>`}
     </div>`);
 }
-async function updateUser(id,status){const res=await api(`api/admin/users.php?id=${id}`,{method:'PATCH',body:JSON.stringify({status})});if(res.success){toast('Updated!');pgUsers();}else toast(em(res),'error');}
-async function togglePerm(id,cur){const res=await api(`api/admin/users.php?id=${id}`,{method:'PATCH',body:JSON.stringify({canWritePrescription:!cur})});if(res.success){toast('Permission updated!');pgUsers();}else toast(em(res),'error');}
+async function updateUser(id,status){
+  if(ROLE!=='ADMIN')return;
+  const res=await api(`api/admin/users.php?id=${id}`,{method:'PATCH',body:JSON.stringify({status})});if(res.success){toast('Updated!');pgUsers();}else toast(em(res),'error');}
+async function togglePerm(id,cur){
+  if(ROLE!=='ADMIN')return;
+  const res=await api(`api/admin/users.php?id=${id}`,{method:'PATCH',body:JSON.stringify({canWritePrescription:!cur})});if(res.success){toast('Permission updated!');pgUsers();}else toast(em(res),'error');}
 
 /* ── ASSIGNMENTS ──────────────────────────────── */
 async function pgAssignments(){
-  const [ar,dr,wr]=await Promise.all([api('api/admin/assignments.php'),api('api/admin/users.php?role=DOCTOR&status=ACTIVE&limit=100'),api('api/admin/users.php?role=HEALTH_WORKER&status=ACTIVE&limit=100')]);
+  let ar,dr,wr;
+  if(ROLE==='ADMIN'){
+    [ar,dr,wr]=await Promise.all([api('api/admin/assignments.php'),api('api/admin/users.php?role=DOCTOR&status=ACTIVE&limit=100'),api('api/admin/users.php?role=HEALTH_WORKER&status=ACTIVE&limit=100')]);
+  }else{
+    ar=await api('api/doctor/my_workers.php');
+    dr={success:true,data:[]};wr={success:true,data:[]};
+  }
   if(!ar.success){setPage(errPage(em(ar),"pgAssignments()"));return;}
   const asgns=ar.data||[],docs=dr.data||[],wks=wr.data||[];
   const grps={};asgns.forEach(a=>{if(!grps[a.doctor.id])grps[a.doctor.id]={doctor:a.doctor,workers:[]};grps[a.doctor.id].workers.push(a.healthWorker);});

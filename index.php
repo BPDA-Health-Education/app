@@ -125,5 +125,6 @@ const USER = <?= json_encode(['id'=>$user['id'],'name'=>$user['name'],'role'=>$u
 <?php endif; ?>
 
 <script src="assets/js/app.js"></script>
+<script src="assets/js/admin.js"></script>
 </body>
 </html>
