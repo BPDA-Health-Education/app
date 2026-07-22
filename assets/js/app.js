@@ -343,6 +343,7 @@ async function pgUsers(search='',status='',role=''){
   const users=res.data||[];
   setPage(`
     <div class="page-header"><h1>User Management</h1><p>Approve, suspend, and manage permissions</p></div>
+    ${ROLE==='ADMIN' && USER.superAdminId?`<div class="card note" style="margin-bottom:12px;padding:10px;background:#f8fafc;border-left:4px solid #3b82f6"><strong>Super Admin ID:</strong> <code>${USER.superAdminId}</code> — Only this user may reset other ADMIN passwords.</div>`:''}
     <div class="filter-bar">
       <div class="search-wrap"><svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${I.search}</svg><input class="search-input" id="usr-s" placeholder="Name, email or phone…" value="${search}" onkeydown="if(event.key==='Enter')pgUsers(this.value,'${status}','${role}')"/></div>
       <div class="pill-row">${['','PENDING','ACTIVE','SUSPENDED'].map((s,i)=>`<button class="pill${status===s?' active':''}" onclick="pgUsers(document.getElementById('usr-s').value,'${s}','${role}')">${['All','Pending','Active','Suspended'][i]}</button>`).join('')}</div>

@@ -134,7 +134,7 @@ session_write_close();
 </div>
 <script>
 window.ROLE = '<?= $user['role'] ?>';
-const USER = <?= json_encode(['id'=>$user['id'],'name'=>$user['name'],'role'=>$user['role'],'canWritePrescription'=>$user['canWritePrescription']]) ?>;
+const USER = <?= json_encode(['id'=>$user['id'],'name'=>$user['name'],'role'=>$user['role'],'canWritePrescription'=>$user['canWritePrescription'],'superAdminId'=>defined('SUPER_ADMIN_ID')?SUPER_ADMIN_ID:null]) ?>;
 
 function toggleMobileMenu() {
   const nav = document.getElementById('sb-nav');
