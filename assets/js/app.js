@@ -277,6 +277,95 @@ async function shareGoogleDoc(docId){
   if(res.success){toast('Document shared!');} else toast(em(res),'error');
 }
 
+  /* ── VIDEO CALLS ──────────────────────────────── */
+  async function pgVideoCalls(){
+    const res=await api('api/video/call.php?role=received&status=PENDING');
+    if(!res.success){setPage(errPage(em(res),"pgVideoCalls()"));return;}
+  
+    const pending=res.data||[];
+    setPage(`
+      <div class="page-header-row">
+        <div class="page-header"><h1>📞 Video Calls</h1><p>${pending.length} pending</p></div>
+        ${ROLE==='HEALTH_WORKER'?`<button class="btn btn-primary" onclick="showInitiateCallModal()">${svg('phone')} Initiate Call</button>`:''}
+      </div>
+      <div class="card card-p">
+        <div style="margin-bottom:20px">
+          <h3 style="font-size:14px;font-weight:600;margin-bottom:12px">📥 Incoming Calls</h3>
+          ${pending.length===0?`<p class="text-muted">No incoming calls</p>`:`
+          <div style="display:flex;flex-direction:column;gap:10px">
+            ${pending.map(c=>\`<div style="padding:12px;border:1px solid #e2e8f0;border-radius:6px;display:flex;justify-content:space-between;align-items:center">
+              <div><div style="font-weight:600">\${c.requester.name}</div><div class="text-muted text-sm">\${c.requester.role} • \${c.note||'No message'}</div></div>
+              <div style="display:flex;gap:8px">
+                <button class="btn btn-sm btn-success" onclick="acceptCall('\${c.id}')">${svg('phone')} Accept</button>
+                <button class="btn btn-sm btn-secondary" onclick="declineCall('\${c.id}')">${svg('phoneOff')} Decline</button>
+              </div>
+            </div>\`).join('')}
+          </div>`}
+        </div>
+      </div>
+    `);
+  }
+
+  async function acceptCall(callId){
+    const res=await api(\`api/video/call.php?id=\${callId}\`,{method:'PATCH',body:JSON.stringify({action:'accept'})});
+    if(res.success){
+      // Fetch call details to get meet URL
+      const callRes=await api(\`api/video/call.php?id=\${callId}\`);
+      if(callRes.success){
+        toast('Call accepted! Opening video');
+        // Redirect to Meet (would be replaced with embedded video widget)
+        setTimeout(()=>pgVideoCalls(),500);
+      }
+    }else toast(em(res),'error');
+  }
+
+  async function declineCall(callId){
+    const res=await api(\`api/video/call.php?id=\${callId}\`,{method:'PATCH',body:JSON.stringify({action:'decline'})});
+    if(res.success){toast('Call declined');pgVideoCalls();}else toast(em(res),'error');
+  }
+
+  function showInitiateCallModal(){
+    const recipients=document.getElementById('USER').role==='HEALTH_WORKER'?[{id:'doctor',name:'Assigned Doctor'}]:[{id:'any',name:'Any Health Worker'}];
+    const modal=\`
+      <div style="padding:20px">
+        <h2 style="margin-bottom:16px">Initiate Video Call</h2>
+        <div class="form-group">
+          <label class="form-label">Select Recipient</label>
+          <select class="form-input" id="recipient-select">
+            \${recipients.map(r=>\`<option value="\${r.id}">\${r.name}</option>\`).join('')}
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Message (optional)</label>
+          <input class="form-input" id="call-note" placeholder="e.g. Need consultation on patient case" />
+        </div>
+        <div style="display:flex;gap:8px;margin-top:20px">
+          <button class="btn btn-primary" onclick="initiateCall()">Start Call</button>
+          <button class="btn btn-secondary" onclick="setPage(null);pgVideoCalls()">Cancel</button>
+        </div>
+      </div>
+    \`;
+    setPage(modal);
+  }
+
+  async function initiateCall(){
+    const note=document.getElementById('call-note').value;
+    const recipient=document.getElementById('recipient-select').value;
+  
+    if(!recipient){toast('Please select a recipient','error');return;}
+  
+    const res=await api('api/video/call.php',{
+      method:'POST',
+      body:JSON.stringify({receiverId:recipient,note})
+    });
+  
+    if(res.success){
+      toast(res.data.escalated?'Call escalated to admin':'Call initiated, waiting for response...');
+      window.open(res.data.meetUrl,'_blank');
+      setTimeout(()=>pgVideoCalls(),1500);
+    }else toast(em(res),'error');
+  }
+
 /* ── NEW PRESCRIPTION ─────────────────────────── */
 let rxStep=0,rxMeds=[],rxItems=[{medicineId:'',dose:'1 tablet',frequency:'Once daily',duration:'5 days',instructions:''}],_rxd={prescriptionType:'GENERAL'};
 async function pgNewRx(){
