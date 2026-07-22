@@ -48,27 +48,10 @@ session_write_close();
       <label class="form-label">Password</label>
       <input class="form-input" id="login-pw" type="password" placeholder="••••••••" autocomplete="current-password"/>
     </div>
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
-      <button class="btn btn-primary" id="login-btn" onclick="doLogin()">Sign In</button>
-      <a href="#" class="text-muted" onclick="showCard('forgot-card')">Forgot password?</a>
+    <div style="display:flex;justify-content:flex-end;align-items:center;margin-bottom:8px">
+      <button class="btn btn-primary btn-block" id="login-btn" onclick="doLogin()">Sign In</button>
     </div>
     <p class="auth-switch">Don't have an account? <a href="#" onclick="showCard('register-card')">Register</a></p>
-  </div>
-
-  <!-- FORGOT PASSWORD -->
-  <div class="auth-card" id="forgot-card" style="display:none">
-    <h2 class="auth-title">Reset Password</h2>
-    <p class="auth-sub">Enter your email or phone to receive a reset link</p>
-    <div id="forgot-error" class="alert alert-error" style="display:none"></div>
-    <div id="forgot-success" class="alert alert-success" style="display:none"></div>
-    <div class="form-group">
-      <label class="form-label">Email or Phone</label>
-      <input class="form-input" id="forgot-id" type="text" placeholder="email@example.com or 01712345678"/>
-    </div>
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
-      <button class="btn btn-primary" onclick="doForgot()">Request Reset</button>
-      <a href="#" class="text-muted" onclick="showCard('login-card')">Back to Sign In</a>
-    </div>
   </div>
 
   <!-- REGISTER -->

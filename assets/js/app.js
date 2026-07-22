@@ -98,9 +98,7 @@ async function go(page, opts={push:true}){
 }
 
 /* ── AUTH ─────────────────────────────────────── */
-function showCard(id){document.querySelectorAll('.auth-card').forEach(c=>c.style.display='none');document.getElementById(id).style.display='block';document.getElementById('login-error')?.style && (document.getElementById('login-error').style.display='none');document.getElementById('reg-error')?.style && (document.getElementById('reg-error').style.display='none');document.getElementById('forgot-error')?.style && (document.getElementById('forgot-error').style.display='none');document.getElementById('forgot-success')?.style && (document.getElementById('forgot-success').style.display='none');}
-function showForgot(){showCard('forgot-card');}
-async function doForgot(){const btn=document.querySelector('#forgot-card .btn');btn.disabled=true;const id=document.getElementById('forgot-id').value.trim();if(!id){document.getElementById('forgot-error').textContent='Please enter email or phone';document.getElementById('forgot-error').style.display='block';btn.disabled=false;return;}const res=await api('api/auth/forgot.php',{method:'POST',body:JSON.stringify({identifier:id})});btn.disabled=false;if(res.success){document.getElementById('forgot-success').textContent=res.data.message||'Reset link sent if account exists.';document.getElementById('forgot-success').style.display='block';}else{document.getElementById('forgot-error').textContent=em(res);document.getElementById('forgot-error').style.display='block';}}
+function showCard(id){document.querySelectorAll('.auth-card').forEach(c=>c.style.display='none');document.getElementById(id).style.display='block';document.getElementById('login-error')?.style && (document.getElementById('login-error').style.display='none');document.getElementById('reg-error')?.style && (document.getElementById('reg-error').style.display='none');}
 
 async function doLogin(){
   const btn=document.getElementById('login-btn'),err=document.getElementById('login-error');
@@ -366,6 +364,7 @@ async function pgUsers(search='',status='',role=''){
           ${u.status==='PENDING'?`<button class="btn btn-sm" style="background:#f0fdf4;color:#16a34a;border:1px solid #dcfce7" onclick="updateUser('${u.id}','ACTIVE')">✓ Approve</button>`:''}
           ${u.status==='ACTIVE'?`<button class="btn btn-sm" style="background:#fef2f2;color:#dc2626;border:1px solid #fee2e2" onclick="updateUser('${u.id}','SUSPENDED')">Suspend</button>`:''}
           ${u.status==='SUSPENDED'?`<button class="btn btn-sm" style="background:#f0fdf4;color:#16a34a;border:1px solid #dcfce7" onclick="updateUser('${u.id}','ACTIVE')">Reactivate</button>`:''}
+          <button class="btn btn-sm" style="margin-left:6px;background:#eef2ff;color:#3730a3;border:1px solid #e0e7ff" onclick="adminResetPassword('${u.id}')">Reset Password</button>
         </td>
       </tr>`).join('')}</tbody></table>`}
     </div>`);
@@ -376,6 +375,17 @@ async function updateUser(id,status){
 async function togglePerm(id,cur){
   if(ROLE!=='ADMIN')return;
   const res=await api(`api/admin/users.php?id=${id}`,{method:'PATCH',body:JSON.stringify({canWritePrescription:!cur})});if(res.success){toast('Permission updated!');pgUsers();}else toast(em(res),'error');}
+
+async function adminResetPassword(userId){
+  if(ROLE!=='ADMIN')return; 
+  const custom = prompt('Enter a new password for this user (leave blank to generate a random one):');
+  let pw = custom && custom.trim() ? custom.trim() : null;
+  if(pw && pw.length<6){alert('Password must be at least 6 characters');return;}
+  if(!pw){pw = Array.from(window.crypto.getRandomValues(new Uint8Array(8))).map(b=>b.toString(16).padStart(2,'0')).join('').slice(0,12);}
+  if(!confirm('Reset password for user? This will set their password to: '+pw)) return;
+  const res = await api('api/admin/reset_password.php',{method:'POST',body:JSON.stringify({userId, password: pw})});
+  if(res.success){toast('Password reset. Share the temporary password securely.');pgUsers();}else{toast(em(res),'error');}
+}
 
 /* ── ASSIGNMENTS ──────────────────────────────── */
 async function pgAssignments(){
