@@ -17,6 +17,10 @@ if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
+// Super admin override (set to the user.id of the super-admin who may reset other ADMINs)
+// Example: define('SUPER_ADMIN_ID', 'abcd1234efgh5678');
+if (!defined('SUPER_ADMIN_ID')) define('SUPER_ADMIN_ID', '');
+
 // PDO singleton
 function db(): PDO {
     static $pdo = null;

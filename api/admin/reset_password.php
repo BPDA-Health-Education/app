@@ -19,10 +19,16 @@ $stmt->execute([':id'=>$targetId]);
 $u = $stmt->fetch();
 if (!$u) json_error('NOT_FOUND','User not found',404);
 
-// Optional: prevent resetting other admins unless super-admin
+// Prevent resetting other ADMINs unless acting admin is the configured SUPER_ADMIN_ID
 if ($u['role'] === 'ADMIN' && $user['id'] !== $u['id']) {
-    // Allow if the acting admin is same as target (self-reset) or implement stricter checks.
-    // For now permit admin resetting other admins.
+    if (defined('SUPER_ADMIN_ID') && SUPER_ADMIN_ID) {
+        if ($user['id'] !== SUPER_ADMIN_ID) {
+            json_error('FORBIDDEN','Only the super-admin may reset other ADMIN passwords',403);
+        }
+    } else {
+        // If SUPER_ADMIN_ID not configured, deny resetting other ADMINs by default
+        json_error('FORBIDDEN','Resetting other ADMIN accounts is disabled. Configure SUPER_ADMIN_ID to allow.',403);
+    }
 }
 
 $hash = password_hash($newPw, PASSWORD_DEFAULT);
