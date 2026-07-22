@@ -79,9 +79,11 @@ function buildNav(){
       ${svg(n.icon)} ${n.label}
     </div>`).join('');
 }
-async function go(page){
-  curPage=page; buildNav(); loading();
+async function go(page, opts={push:true}){
   try{
+    if(!page) page='dashboard';
+    if(opts.push) history.pushState({page:page}, '', '#'+page);
+    curPage=page; buildNav(); loading();
     if(page==='dashboard')    return await pgDashboard();
     if(page==='prescriptions')return await pgRxList();
     if(page==='new-rx')       return await pgNewRx();
@@ -90,11 +92,15 @@ async function go(page){
     if(page==='assignments')  return await pgAssignments();
     if(page==='video-calls')  return await pgVideoCalls();
     if(page.startsWith('rx-'))return await pgRxDetail(page.slice(3));
+    // Unknown page -> dashboard
+    return await pgDashboard();
   }catch(e){setPage(errPage('Unexpected error: '+e.message,`go('${page}')`))}
 }
 
 /* ── AUTH ─────────────────────────────────────── */
-function showCard(id){document.querySelectorAll('.auth-card').forEach(c=>c.style.display='none');document.getElementById(id).style.display='block';}
+function showCard(id){document.querySelectorAll('.auth-card').forEach(c=>c.style.display='none');document.getElementById(id).style.display='block';document.getElementById('login-error')?.style && (document.getElementById('login-error').style.display='none');document.getElementById('reg-error')?.style && (document.getElementById('reg-error').style.display='none');document.getElementById('forgot-error')?.style && (document.getElementById('forgot-error').style.display='none');document.getElementById('forgot-success')?.style && (document.getElementById('forgot-success').style.display='none');}
+function showForgot(){showCard('forgot-card');}
+async function doForgot(){const btn=document.querySelector('#forgot-card .btn');btn.disabled=true;const id=document.getElementById('forgot-id').value.trim();if(!id){document.getElementById('forgot-error').textContent='Please enter email or phone';document.getElementById('forgot-error').style.display='block';btn.disabled=false;return;}const res=await api('api/auth/forgot.php',{method:'POST',body:JSON.stringify({identifier:id})});btn.disabled=false;if(res.success){document.getElementById('forgot-success').textContent=res.data.message||'Reset link sent if account exists.';document.getElementById('forgot-success').style.display='block';}else{document.getElementById('forgot-error').textContent=em(res);document.getElementById('forgot-error').style.display='block';}}
 
 async function doLogin(){
   const btn=document.getElementById('login-btn'),err=document.getElementById('login-error');
@@ -434,5 +440,20 @@ document.addEventListener('DOMContentLoaded',()=>{
     document.getElementById('reg-pw')?.addEventListener('keydown',e=>e.key==='Enter'&&doRegister());
     return;
   }
-  if(window.ROLE){buildNav();go('dashboard');}
+  if(window.ROLE){
+    buildNav();
+    // Close mobile nav on item click (ensure newly created items are wired)
+    setTimeout(()=>{
+      document.querySelectorAll('.nav-item').forEach(item=>item.addEventListener('click',()=>{document.getElementById('sb-nav')?.classList.remove('mobile-open');document.querySelector('.mobile-menu-btn')?.classList.remove('active');}));
+    },50);
+
+    // Handle browser back/forward to stay inside the SPA
+    window.addEventListener('popstate', function(e){
+      const p = (e.state && e.state.page) ? e.state.page : (location.hash?location.hash.slice(1):'dashboard');
+      go(p, {push:false});
+    });
+
+    const initial = location.hash ? location.hash.slice(1) : 'dashboard';
+    go(initial, {push:false});
+  }
 });
