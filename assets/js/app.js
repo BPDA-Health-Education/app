@@ -556,22 +556,30 @@ async function pgAssignments(){
     dr={success:true,data:[]};wr={success:true,data:[]};
   }
   if(!ar.success){setPage(errPage(em(ar),"pgAssignments()"));return;}
-  const asgns=ar.data||[],docs=dr.data||[],wks=wr.data||[];
-  const grps={};asgns.forEach(a=>{if(!grps[a.doctor.id])grps[a.doctor.id]={doctor:a.doctor,workers:[]};grps[a.doctor.id].workers.push(a.healthWorker);});
+  let asgns=ar.data||[];
+  // Transform doctor view data to match admin view format
+  if(ROLE==='DOCTOR'&&asgns.length>0&&asgns[0].doctorId){
+    asgns=asgns.map(w=>({
+      doctor:{id:w.doctorId,name:w.doctorName,email:''},
+      healthWorker:{id:w.id,name:w.name,email:w.email,phone:w.phone,status:w.status}
+    }));
+  }
+  const docs=dr.data||[],wks=wr.data||[];
+  const grps={};asgns.forEach(a=>{if(a.doctor&&a.healthWorker){if(!grps[a.doctor.id])grps[a.doctor.id]={doctor:a.doctor,workers:[]};grps[a.doctor.id].workers.push(a.healthWorker);}});
   setPage(`
-    <div class="page-header"><h1>Assignments</h1><p>Assign health workers to doctors</p></div>
-    <div class="card card-p" style="margin-bottom:16px">
+    <div class="page-header"><h1>Assignments</h1><p>${ROLE==='ADMIN'?'Assign health workers to doctors':'Your assigned health workers'}</p></div>
+    ${ROLE==='ADMIN'?`<div class="card card-p" style="margin-bottom:16px">
       <div class="card-header"><span class="card-title">New Assignment</span></div>
       <div style="display:grid;grid-template-columns:1fr 1fr auto;gap:12px;align-items:flex-end">
         <div class="form-group" style="margin-bottom:0"><label class="form-label">Doctor</label><select class="form-input" id="asgn-d"><option value="">— Select Doctor —</option>${docs.map(d=>`<option value="${d.id}">${d.name}</option>`).join('')}</select></div>
         <div class="form-group" style="margin-bottom:0"><label class="form-label">Health Worker</label><select class="form-input" id="asgn-w"><option value="">— Select Worker —</option>${wks.map(w=>`<option value="${w.id}">${w.name}</option>`).join('')}</select></div>
         <button class="btn btn-primary" onclick="createAssignment()">${svg('userPlus')} Assign</button>
       </div>
-    </div>
-    ${Object.values(grps).length===0?`<div class="empty-state" style="margin-top:20px">${svg('link')}<h3>No assignments yet</h3><p>Use the form above to assign health workers</p></div>`
+    </div>`:''}
+    ${Object.values(grps).length===0?`<div class="empty-state" style="margin-top:20px">${svg('link')}<h3>No assignments yet</h3><p>${ROLE==='ADMIN'?'Use the form above to assign health workers':'You have no assigned health workers'}</p></div>`
       :Object.values(grps).map(g=>`<div class="assign-group">
         <div class="assign-group-hdr"><div><div style="font-weight:600">${g.doctor.name}</div><div class="text-muted text-sm">${g.doctor.email||''}</div></div><span class="badge badge-blue">${g.workers.length} worker${g.workers.length!==1?'s':''}</span></div>
-        ${g.workers.map(w=>`<div class="assign-row"><div><div style="font-size:13px;font-weight:500">${w.name}</div><div class="text-muted text-sm">${w.phone||w.email||'—'}</div></div><button onclick="removeAssignment('${w.id}')" style="display:inline-flex;align-items:center;gap:4px;font-size:12px;font-weight:600;color:#dc2626;border:none;background:none;cursor:pointer">${svg('unlink')} Remove</button></div>`).join('')}
+        ${g.workers.map(w=>`<div class="assign-row"><div><div style="font-size:13px;font-weight:500">${w.name}</div><div class="text-muted text-sm">${w.phone||w.email||'—'}</div></div>${ROLE==='ADMIN'?`<button onclick="removeAssignment('${w.id}')" style="display:inline-flex;align-items:center;gap:4px;font-size:12px;font-weight:600;color:#dc2626;border:none;background:none;cursor:pointer">${svg('unlink')} Remove</button>`:''}</div>`).join('')}
       </div>`).join('')}`);
 }
 async function createAssignment(){
