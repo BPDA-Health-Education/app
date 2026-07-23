@@ -35,7 +35,7 @@ if ($method === 'POST') {
 
     $newId = bin2hex(random_bytes(8));
     $pdo->prepare("INSERT INTO doctor_assignments(id,doctor_id,health_worker_id) VALUES(:id,:d,:w)
-        ON DUPLICATE KEY UPDATE doctor_id=:d")
+        ON DUPLICATE KEY UPDATE health_worker_id=:w")
         ->execute([':id'=>$newId,':d'=>$docId,':w'=>$hwId]);
     audit('ASSIGNED','DoctorAssignment',$newId,['doctor'=>$doc['name'],'hw'=>$hw['name']]);
     json_ok(['doctorId'=>$docId,'healthWorkerId'=>$hwId],201);
