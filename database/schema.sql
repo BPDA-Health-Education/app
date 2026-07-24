@@ -1,4 +1,4 @@
--- PalliCare — MySQL Schema
+-- BPDA Telemedicine — MySQL Schema
 -- Import via cPanel → phpMyAdmin → Import
 -- Run setup.php after importing to create tables AND seed users
 

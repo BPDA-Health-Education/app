@@ -1,6 +1,6 @@
 <?php
 /**
- * PalliCare Setup
+ * BPDA Telemedicine App Setup
  * Visit once after uploading. DELETE this file after setup!
  */
 $error = $success = $info = '';
@@ -28,16 +28,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
 
             // ── Generate ALL hashes fresh with PHP ──────────────────────────
-            $h123 = password_hash('password123', PASSWORD_BCRYPT, ['cost' => 12]);
+            $h123 = password_hash('Password@123', PASSWORD_BCRYPT, ['cost' => 12]);
 
             // Seed users with PHP-generated hashes
             $users = [
-                ['id'=>'u-admin-001', 'name'=>'System Admin',    'email'=>'admin@pallicare.dev',      'phone'=>null, 'hash'=>$h123, 'role'=>'ADMIN',        'status'=>'ACTIVE', 'cwp'=>0],
-                ['id'=>'u-doc-001',   'name'=>'Dr. Abdul Karim', 'email'=>'dr.karim@pallicare.dev',   'phone'=>null, 'hash'=>$h123, 'role'=>'DOCTOR',       'status'=>'ACTIVE', 'cwp'=>0],
-                ['id'=>'u-doc-002',   'name'=>'Dr. Fatema Mina', 'email'=>'dr.mina@pallicare.dev',    'phone'=>null, 'hash'=>$h123, 'role'=>'DOCTOR',       'status'=>'ACTIVE', 'cwp'=>0],
-                ['id'=>'u-hw-001',    'name'=>'Abdur Rahim',     'email'=>'hw.rahim@pallicare.dev',   'phone'=>'01712345678', 'hash'=>$h123, 'role'=>'HEALTH_WORKER','status'=>'ACTIVE', 'cwp'=>1],
-                ['id'=>'u-hw-002',    'name'=>'Nasrin Akter',    'email'=>'hw.nasrin@pallicare.dev',  'phone'=>'01823456789', 'hash'=>$h123, 'role'=>'HEALTH_WORKER','status'=>'ACTIVE', 'cwp'=>1],
-                ['id'=>'u-hw-003',    'name'=>'Jalal Uddin',     'email'=>'hw.jalal@pallicare.dev',   'phone'=>'01934567890', 'hash'=>$h123, 'role'=>'HEALTH_WORKER','status'=>'PENDING','cwp'=>0],
+                ['id'=>'u-admin-001', 'name'=>'System Admin',    'email'=>'admin@gpayauto.org',      'phone'=>null, 'hash'=>$h123, 'role'=>'ADMIN',        'status'=>'ACTIVE', 'cwp'=>0],
+                ['id'=>'u-admin-002', 'name'=>'App Admin',    'email'=>'admin2@gpayauto.org',      'phone'=>null, 'hash'=>$h123, 'role'=>'ADMIN',        'status'=>'ACTIVE', 'cwp'=>0],
+                ['id'=>'u-doc-001',   'name'=>'Dr. Abdul Karim', 'email'=>'dr.karim@gpayauto.org',   'phone'=>null, 'hash'=>$h123, 'role'=>'DOCTOR',       'status'=>'ACTIVE', 'cwp'=>0],
+                ['id'=>'u-doc-002',   'name'=>'Dr. Fatema Mina', 'email'=>'dr.mina@gpayauto.org',    'phone'=>null, 'hash'=>$h123, 'role'=>'DOCTOR',       'status'=>'ACTIVE', 'cwp'=>0],
+                ['id'=>'u-hw-001',    'name'=>'Abdur Rahim',     'email'=>'hw.rahim@gpayauto.org',   'phone'=>'01712345678', 'hash'=>$h123, 'role'=>'HEALTH_WORKER','status'=>'ACTIVE', 'cwp'=>1],
+                ['id'=>'u-hw-002',    'name'=>'Nasrin Akter',    'email'=>'hw.nasrin@gpayauto.org',  'phone'=>'01823456789', 'hash'=>$h123, 'role'=>'HEALTH_WORKER','status'=>'ACTIVE', 'cwp'=>1],
+                ['id'=>'u-hw-003',    'name'=>'Jalal Uddin',     'email'=>'hw.jalal@gpayauto.org',   'phone'=>'01934567890', 'hash'=>$h123, 'role'=>'HEALTH_WORKER','status'=>'PENDING','cwp'=>0],
             ];
             $uStmt = $pdo->prepare("INSERT IGNORE INTO users(id,name,email,phone,password_hash,role,status,can_write_prescription) VALUES(:id,:name,:email,:phone,:hash,:role,:status,:cwp)");
             foreach ($users as $u) $uStmt->execute([':id'=>$u['id'],':name'=>$u['name'],':email'=>$u['email'],':phone'=>$u['phone'],':hash'=>$u['hash'],':role'=>$u['role'],':status'=>$u['status'],':cwp'=>$u['cwp']]);
@@ -107,7 +108,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <html lang="en">
 <head>
 <meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/>
-<title>PalliCare Setup</title>
+<title>BPDA Telemedicine App Setup</title>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 body{font-family:-apple-system,'Inter',sans-serif;background:#f1f5f9;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px}
@@ -131,7 +132,7 @@ a.go{display:block;text-align:center;margin-top:16px;background:#2998ab;color:#f
 </head>
 <body>
 <div class="box">
-<h1>🏥 PalliCare Setup</h1>
+<h1>🏥 BPDA Telemedicine App Setup</h1>
 <p class="sub">Connect your Namecheap cPanel MySQL database</p>
 
 <?php if ($success): ?>
@@ -139,15 +140,16 @@ a.go{display:block;text-align:center;margin-top:16px;background:#2998ab;color:#f
   ✅ <strong>Setup complete!</strong> All tables created, users seeded with correct passwords.
 </div>
 <div class="creds">
-  <p><strong>All demo passwords: <code>password123</code></strong></p>
-  <p>Admin: <code>admin@pallicare.dev</code></p>
-  <p>Doctor: <code>dr.karim@pallicare.dev</code></p>
-  <p>Doctor: <code>dr.mina@pallicare.dev</code></p>
-  <p>Health Worker: <code>hw.rahim@pallicare.dev</code></p>
-  <p>Health Worker: <code>hw.nasrin@pallicare.dev</code></p>
+  <p><strong>All demo passwords: <code>Password@123</code></strong></p>
+  <p>Admin: <code>admin@pgpayauto.org</code></p>
+  <p>Admin: <code>admin2@pgpayauto.org</code></p>
+  <p>Doctor: <code>dr.karim@gpayauto.org</code></p>
+  <p>Doctor: <code>dr.mina@gpayauto.org</code></p>
+  <p>Health Worker: <code>hw.rahim@gpayauto.org</code></p>
+  <p>Health Worker: <code>hw.nasrin@gpayauto.org</code></p>
   <p style="color:#dc2626;margin-top:8px">⚠️ Delete <code>setup.php</code> from File Manager now!</p>
 </div>
-<a class="go" href="/">→ Go to PalliCare Login</a>
+<a class="go" href="/">→ Go to BPDA Telemedicine App Login</a>
 
 <?php else: ?>
 <div class="warn">⚠️ <strong>Delete this file after setup is complete.</strong></div>

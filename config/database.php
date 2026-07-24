@@ -1,8 +1,8 @@
 <?php
 define('DB_HOST',    'localhost');
-define('DB_NAME',    'your_db_name');     // ← Change this
-define('DB_USER',    'your_db_user');     // ← Change this
-define('DB_PASS',    'your_db_password'); // ← Change this
+define('DB_NAME',    'gpayadmin_appb');     // ← Change this
+define('DB_USER',    'gpayadmin_bapp');     // ← Change this
+define('DB_PASS',    ''); // ← Change this
 define('DB_CHARSET', 'utf8mb4');
 
 // Start session once — httpOnly, secure, no JS access
